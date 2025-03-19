@@ -344,7 +344,7 @@ class HowToGeekCrawler(AbstractCrawler):
                             published_date=published_date,
                             content=article_data.get('content', ''),
                             url=article_data.get('url', ''),
-                            html_content=article_data.get('content', ''),
+                            html_content=article_data.get('html_content', ''),
                             source='howtogeek',
                             keyword=keyword  # 设置关键词
                         )

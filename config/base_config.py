@@ -9,22 +9,25 @@ class BaseConfig:
             'url': 'https://www.howtogeek.com',
             'latest_url': 'https://www.howtogeek.com/news/',
             'max_articles': 2,
-            'search_keywords': []  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
+            'search_keywords': ['deepseek']  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
         },
         'uniteai': {
             'url': 'https://www.unite.ai',
-            'latest_url': 'https://www.unite.ai/news/',
-            'max_articles': 10
+            'latest_url': 'https://www.unite.ai',
+            'max_articles': 2,
+            'search_keywords': ['Nvidia', 'deepseek', 'chatgpt']  # 添加deepseek和deekseek作为搜索关键词
         },
         'marktechpost': {
             'url': 'https://www.marktechpost.com',
             'latest_url': 'https://www.marktechpost.com/category/artificial-intelligence/',
-            'max_articles': 10
+            'max_articles': 10,
+            'search_keywords': []  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
         },
         'the_decoder': {
             'url': 'https://the-decoder.com',
             'latest_url': 'https://the-decoder.com/news/',
-            'max_articles': 10
+            'max_articles': 10,
+            'search_keywords': []  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
         }
     }
     

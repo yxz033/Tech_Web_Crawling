@@ -2,10 +2,12 @@ import asyncio
 import logging
 import warnings
 import sys
+import argparse
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.base_config import BaseConfig
 from base.base_crawler import AbstractCrawler
 from news_sites.howtogeek import HowToGeekCrawler
+from news_sites.uniteai import UniteAICrawler
 from store.json import JSONStore
 
 # 添加警告过滤，抑制Windows平台上asyncio的管道关闭警告
@@ -76,12 +78,13 @@ class TechTrendCrawler:
                     logger.info("文章保存成功")
                     
                     # 打印第一篇文章的信息作为示例
-                    first_article = articles[0]
-                    logger.info("\n第一篇文章信息:")
-                    logger.info(f"标题: {first_article.title}")
-                    logger.info(f"作者: {first_article.author}")
-                    logger.info(f"发布时间: {first_article.published_date}")
-                    logger.info(f"链接: {first_article.url}")
+                    if articles:
+                        first_article = articles[0]
+                        logger.info("\n第一篇文章信息:")
+                        logger.info(f"标题: {first_article.title}")
+                        logger.info(f"作者: {first_article.author}")
+                        logger.info(f"发布时间: {first_article.published_date}")
+                        logger.info(f"链接: {first_article.url}")
                 
             finally:
                 # 关闭浏览器
@@ -89,6 +92,44 @@ class TechTrendCrawler:
                 
         except Exception as e:
             logger.error(f"测试HowToGeek爬虫时出错: {str(e)}")
+            raise
+            
+    async def test_uniteai(self):
+        """测试UniteAI爬虫"""
+        try:
+            logger.info("开始测试UniteAI爬虫...")
+            
+            # 创建UniteAI爬虫实例
+            crawler = UniteAICrawler(self.config.NEWS_SITES['uniteai'])
+            
+            # 初始化浏览器
+            await crawler.init_browser()
+            
+            try:
+                # 爬取文章
+                articles = await crawler.crawl()
+                logger.info(f"爬取到{len(articles)}篇文章")
+                
+                # 保存文章
+                if articles:
+                    await self.store.save_articles(articles)
+                    logger.info("文章保存成功")
+                    
+                    # 打印第一篇文章的信息作为示例
+                    if articles:
+                        first_article = articles[0]
+                        logger.info("\n第一篇文章信息:")
+                        logger.info(f"标题: {first_article.title}")
+                        logger.info(f"作者: {first_article.author}")
+                        logger.info(f"发布时间: {first_article.published_date}")
+                        logger.info(f"链接: {first_article.url}")
+                
+            finally:
+                # 关闭浏览器
+                await crawler.close_browser()
+                
+        except Exception as e:
+            logger.error(f"测试UniteAI爬虫时出错: {str(e)}")
             raise
 
     def configure_schedules(self):
@@ -139,8 +180,21 @@ class TechTrendCrawler:
 
 async def main():
     """程序入口"""
+    # 解析命令行参数
+    parser = argparse.ArgumentParser(description='科技趋势爬虫')
+    parser.add_argument('platform', nargs='?', default='all', 
+                        choices=['all', 'howtogeek', 'uniteai'], 
+                        help='要爬取的平台: howtogeek, uniteai或all(默认)')
+    args = parser.parse_args()
+    
     crawler = TechTrendCrawler()
-    await crawler.test_howtogeek()
+    
+    # 根据命令行参数选择爬取平台
+    if args.platform == 'all' or args.platform == 'howtogeek':
+        await crawler.test_howtogeek()
+    
+    if args.platform == 'all' or args.platform == 'uniteai':
+        await crawler.test_uniteai()
 
 async def cleanup_resources():
     """清理异步资源"""
