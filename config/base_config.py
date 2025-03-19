@@ -3,40 +3,63 @@ from typing import List, Dict
 class BaseConfig:
     """基础配置类"""
     
+    # 存储配置
+    STORAGE_CONFIG = {
+        'storage_path': './data',
+        'news_directory': 'news',
+        'trends_directory': 'trends',
+        'reports_directory': 'reports'
+    }
+    
+    # 调度器配置
+    SCHEDULER_CONFIG = {
+        'news_crawl_hour': 8,  # 每天8点爬取新闻
+        'news_crawl_minute': 0,
+        'weekly_report_day': 'sun',  # 每周日生成周报
+        'weekly_report_hour': 20,
+        'weekly_report_minute': 0
+    }
+    
     # 新闻网站配置
     NEWS_SITES = {
+        # HowToGeek
         'howtogeek': {
-            'url': 'https://www.howtogeek.com',
-            'latest_url': 'https://www.howtogeek.com/news/',
-            'max_articles': 2,
-            'search_keywords': ['deepseek']  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
+            'name': 'HowToGeek',
+            'base_url': 'https://www.howtogeek.com/', # 请勿修改
+            'latest_url': 'https://www.howtogeek.com/news/', # 请勿修改
+            'max_articles': 10,  # 每次最多爬取10篇文章
+            'search_keywords': ['deepseek', 'chatgpt', 'ai', 'llm', 'claude', 'gemini']
         },
+        # UniteAI
         'uniteai': {
-            'url': 'https://www.unite.ai',
-            'latest_url': 'https://www.unite.ai',
-            'max_articles': 2,
-            'search_keywords': ['Nvidia', 'deepseek', 'chatgpt']  # 添加deepseek和deekseek作为搜索关键词
+            'name': 'UniteAI',
+            'base_url': 'https://www.unite.ai/',
+            'latest_url': 'https://www.unite.ai', # 请勿修改
+            'max_articles': 10,  # 每次最多爬取10篇文章
+            'search_keywords': ['deepseek', 'deekseek', 'chatgpt']
         },
+        # MarkTechPost
         'marktechpost': {
-            'url': 'https://www.marktechpost.com',
-            'latest_url': 'https://www.marktechpost.com/category/artificial-intelligence/',
-            'max_articles': 10,
-            'search_keywords': []  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
-        },
-        'the_decoder': {
-            'url': 'https://the-decoder.com',
-            'latest_url': 'https://the-decoder.com/news/',
-            'max_articles': 10,
-            'search_keywords': []  # 添加搜索关键词列表字段，示例：['deepseek', 'Cursor']   
+            'name': 'MarkTechPost',
+            'base_url': 'https://www.marktechpost.com/',
+            'latest_url': 'https://www.marktechpost.com/category/tech-news/', # 请勿修改
+            'max_articles': 3,  # 每次最多爬取10篇文章
+            'search_keywords': ['deepseek'] # 示例：['deepseek', 'chatgpt', 'claude', 'gemini', 'llama']
+        }
+    }
+    
+    # 趋势网站配置
+    TREND_SITES = {
+        # GitHub Trending
+        'github': {
+            'name': 'GitHub',
+            'trending_url': 'https://github.com/trending',
+            'languages': ['python', 'javascript']  # 要爬取的语言趋势
         }
     }
     
     # 趋势平台配置
     TREND_PLATFORMS = {
-        'github': {
-            'url': 'https://github.com/trending',
-            'max_items': 25
-        },
         'twitter': {
             'url': 'https://twitter.com/explore/tabs/trending',
             'max_items': 25
@@ -67,14 +90,4 @@ class BaseConfig:
         },
         'csv_path': 'data/articles.csv',
         'json_path': 'data/articles.json'
-    }
-    
-    # 定时任务配置
-    SCHEDULER_CONFIG = {
-        'news_crawl_hour': 0,    # 新闻爬取时间(24小时制)
-        'news_crawl_minute': 0,  # 新闻爬取分钟
-        'trend_crawl_interval': 3600,  # 趋势爬取间隔(秒)
-        'weekly_report_day': 'sun',     # 周报生成日期
-        'weekly_report_hour': 0,        # 周报生成时间
-        'weekly_report_minute': 0       # 周报生成分钟
     } 

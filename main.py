@@ -8,6 +8,7 @@ from config.base_config import BaseConfig
 from base.base_crawler import AbstractCrawler
 from news_sites.howtogeek import HowToGeekCrawler
 from news_sites.uniteai import UniteAICrawler
+from news_sites.marktechpost import MarkTechPostCrawler
 from store.json import JSONStore
 
 # 添加警告过滤，抑制Windows平台上asyncio的管道关闭警告
@@ -131,6 +132,44 @@ class TechTrendCrawler:
         except Exception as e:
             logger.error(f"测试UniteAI爬虫时出错: {str(e)}")
             raise
+            
+    async def test_marktechpost(self):
+        """测试MarkTechPost爬虫"""
+        try:
+            logger.info("开始测试MarkTechPost爬虫...")
+            
+            # 创建MarkTechPost爬虫实例
+            crawler = MarkTechPostCrawler(self.config.NEWS_SITES['marktechpost'])
+            
+            # 初始化浏览器
+            await crawler.init_browser()
+            
+            try:
+                # 爬取文章
+                articles = await crawler.crawl()
+                logger.info(f"爬取到{len(articles)}篇文章")
+                
+                # 保存文章
+                if articles:
+                    await self.store.save_articles(articles)
+                    logger.info("文章保存成功")
+                    
+                    # 打印第一篇文章的信息作为示例
+                    if articles:
+                        first_article = articles[0]
+                        logger.info("\n第一篇文章信息:")
+                        logger.info(f"标题: {first_article.title}")
+                        logger.info(f"作者: {first_article.author}")
+                        logger.info(f"发布时间: {first_article.published_date}")
+                        logger.info(f"链接: {first_article.url}")
+                
+            finally:
+                # 关闭浏览器
+                await crawler.close_browser()
+                
+        except Exception as e:
+            logger.error(f"测试MarkTechPost爬虫时出错: {str(e)}")
+            raise
 
     def configure_schedules(self):
         """配置定时任务"""
@@ -183,8 +222,8 @@ async def main():
     # 解析命令行参数
     parser = argparse.ArgumentParser(description='科技趋势爬虫')
     parser.add_argument('platform', nargs='?', default='all', 
-                        choices=['all', 'howtogeek', 'uniteai'], 
-                        help='要爬取的平台: howtogeek, uniteai或all(默认)')
+                        choices=['all', 'howtogeek', 'uniteai', 'marktechpost'], 
+                        help='要爬取的平台: howtogeek, uniteai, marktechpost或all(默认)')
     args = parser.parse_args()
     
     crawler = TechTrendCrawler()
@@ -195,6 +234,9 @@ async def main():
     
     if args.platform == 'all' or args.platform == 'uniteai':
         await crawler.test_uniteai()
+        
+    if args.platform == 'all' or args.platform == 'marktechpost':
+        await crawler.test_marktechpost()
 
 async def cleanup_resources():
     """清理异步资源"""
